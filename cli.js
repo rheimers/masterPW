@@ -14,9 +14,10 @@ const questions = [
 ];
 inquirer.prompt(questions).then((answers) => {
   console.log(`Your password is ${answers.password}`);
+  console.log(`You like to know the password of ${answers.key}!`);
   if (answers.password === "123") {
+    console.log("Password is right!");
   } else {
     console.log("Something went wrong");
   }
-  console.log(`You like to know the password of ${answers.key}!`);
 });
