@@ -1,0 +1,23 @@
+{
+  "name": "masterPW",
+  "version": "1.0.0",
+  "description": "Creating my own password manager",
+  "main": "cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rheimers/masterPW.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rheimers/masterPW/issues"
+  },
+  "homepage": "https://github.com/rheimers/masterPW#readme",
+  "dependencies": {
+    "inquirer": "^7.3.3"
+  }
+}
