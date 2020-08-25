@@ -40,28 +40,30 @@ const questionsSet = [
   },
 ];
 
-inquirer.prompt(questionsIntro).then(async ({ masterPassword, action }) => {
+async function main() {
+  const { masterPassword, action } = await inquirer.prompt(questionsIntro);
+
   if (masterPassword === "123") {
     console.log("Master Password is correct!");
     if (action === OPTION_READ) {
       console.log("Now Get a password");
-      inquirer.prompt(questionsRetrieve).then(async ({ key }) => {
-        try {
-          const passwordsJSON = await fs.readFile("./passwords.json", "utf-8");
-          const passwords = JSON.parse(passwordsJSON);
-          console.log(`Your ${key} password is ${passwords[key]}`);
-        } catch (error) {
-          console.error("Something went wrong 😑");
-          // What to do now?
-        }
-      });
+      const { key } = await inquirer.prompt(questionsRetrieve);
+      try {
+        const passwordsJSON = await fs.readFile("./passwords.json", "utf-8");
+        const passwords = JSON.parse(passwordsJSON);
+        console.log(`Your ${key} password is ${passwords[key]}`);
+      } catch (error) {
+        console.error("Something went wrong 😑");
+        // What to do now?
+      }
     } else if (action === OPTION_SET) {
       console.log("Now Set a password");
-      inquirer.prompt(questionsSet).then(async ({ key, password }) => {
-        console.log(`New Password: ${key} = ${password}`);
-      });
+      const { key, password } = await inquirer.prompt(questionsSet);
+      console.log(`New Password: ${key} = ${password}`);
     }
   } else {
     console.log("Master Password is incorrect!");
   }
-});
+}
+
+main();
