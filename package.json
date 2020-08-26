@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/rheimers/masterPW#readme",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "inquirer": "^7.3.3"
   }
 }
