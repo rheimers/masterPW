@@ -2,16 +2,30 @@ const {
   askIntroQuestions,
   askRetrievePasswordQuestions,
   askSetPasswordQuestions,
+  askForNewMasterPassword,
   OPTION_READ,
   OPTION_SET,
 } = require("./lib/questions");
-const { readPassword, writePassword } = require("./lib/passwords");
-const { encrypt, decrypt, createHash, verifyHash } = require("./lib/crypto");
+const {
+  readPassword,
+  writePassword,
+  readMasterPassword,
+  writeMasterPassword,
+} = require("./lib/passwords");
+const { encrypt, decrypt } = require("./lib/crypto");
 
 async function main() {
+  const originalMasterPassword = await readMasterPassword();
+  if (!originalMasterPassword) {
+    const { newMasterPassword } = await askForNewMasterPassword();
+    await writeMasterPassword(newMasterPassword);
+    console.log("Master Password set!");
+    return;
+  }
+
   const { masterPassword, action } = await askIntroQuestions();
 
-  if (masterPassword === "123") {
+  if (masterPassword !== originalMasterPassword) {
     console.log("Master Password is correct!");
     if (action === OPTION_READ) {
       console.log("Now Get a password");
