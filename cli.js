@@ -6,6 +6,7 @@ const {
   OPTION_SET,
 } = require("./lib/questions");
 const { readPassword, writePassword } = require("./lib/passwords");
+const { encrypt, decrypt, createHash, verifyHash } = require("./lib/crypto");
 
 async function main() {
   const { masterPassword, action } = await askIntroQuestions();
@@ -17,7 +18,8 @@ async function main() {
       const { key } = await askRetrievePasswordQuestions();
       try {
         const password = await readPassword(key);
-        console.log(`Your ${key} password is ${password}`);
+        const decryptPassword = decrypt(password, masterPassword);
+        console.log(`Your ${key} password is ${decryptPassword}`);
       } catch (error) {
         console.error("Oops, something went wrong");
         // What to do now?
@@ -25,7 +27,9 @@ async function main() {
     } else if (action === OPTION_SET) {
       console.log("Now Set a password");
       const { key, password } = await askSetPasswordQuestions();
-      await writePassword(key, password);
+      const encryptedPassword = encrypt(password, masterPassword);
+      console.log(encryptedPassword);
+      await writePassword(key, encryptedPassword);
       console.log(`New Password set`);
     }
   } else {
