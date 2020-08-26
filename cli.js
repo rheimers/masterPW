@@ -2,22 +2,39 @@ const {
   askIntroQuestions,
   askRetrievePasswordQuestions,
   askSetPasswordQuestions,
+  askForNewMasterPassword,
   OPTION_READ,
   OPTION_SET,
 } = require("./lib/questions");
-const { readPassword, writePassword } = require("./lib/passwords");
+const {
+  readPassword,
+  writePassword,
+  readMasterPassword,
+  writeMasterPassword,
+} = require("./lib/passwords");
+const { encrypt, decrypt, createHash, verifyHash } = require("./lib/crypto");
 
 async function main() {
-  const { masterPassword, action } = await askIntroQuestions();
+  const originalMasterPassword = await readMasterPassword();
+  if (!originalMasterPassword) {
+    const { newMasterPassword } = await askForNewMasterPassword();
+    const hashedMasterPassword = createHash(newMasterPassword);
+    await writeMasterPassword(hashedMasterPassword);
+    console.log("Master Password set!");
+    return;
+  }
 
-  if (masterPassword === "123") {
+  const { masterPassword, action } = await askIntroQuestions();
+  const verifiedHash = verifyHash(masterPassword, originalMasterPassword);
+  if (verifiedHash) {
     console.log("Master Password is correct!");
     if (action === OPTION_READ) {
       console.log("Now Get a password");
       const { key } = await askRetrievePasswordQuestions();
       try {
         const password = await readPassword(key);
-        console.log(`Your ${key} password is ${password}`);
+        const decryptPassword = decrypt(password, masterPassword);
+        console.log(`Your ${key} password is ${decryptPassword}`);
       } catch (error) {
         console.error("Oops, something went wrong");
         // What to do now?
@@ -25,7 +42,9 @@ async function main() {
     } else if (action === OPTION_SET) {
       console.log("Now Set a password");
       const { key, password } = await askSetPasswordQuestions();
-      await writePassword(key, password);
+      const encryptedPassword = encrypt(password, masterPassword);
+      console.log(encryptedPassword);
+      await writePassword(key, encryptedPassword);
       console.log(`New Password set`);
     }
   } else {
