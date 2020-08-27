@@ -19,6 +19,7 @@
   "homepage": "https://github.com/rheimers/masterPW#readme",
   "dependencies": {
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "inquirer": "^7.3.3",
     "mongodb": "^3.6.0"
   }
