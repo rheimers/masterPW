@@ -14,14 +14,18 @@ app.use(bodyParser.json());
 
 const port = 3000;
 
-app.get("/", (request, response) => {
-  response.sendFile(__dirname + "/index.html");
-});
-
 async function main() {
   await client.connect();
   const database = client.db(process.env.MONGO_DB_NAME);
   const masterPassword = process.env.MASTER_PASSWORD;
+
+  app.get("/api/passwords/:name", async (request, response) => {
+    const { name } = request.params;
+    const encryptedPassword = await readPassword(name, database);
+    const password = decrypt(encryptedPassword, masterPassword);
+
+    response.send(password);
+  });
 
   app.post("/api/passwords", async (request, response) => {
     console.log("POST on /api/passwords");
@@ -29,6 +33,10 @@ async function main() {
     const encryptedPassword = encrypt(value, masterPassword);
     await writePassword(name, encryptedPassword, database);
     response.status(201).send("Password created");
+  });
+
+  app.get("/", (request, response) => {
+    response.sendFile(__dirname + "/index.html");
   });
 
   app.listen(port, function () {
