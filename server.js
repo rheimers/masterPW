@@ -14,6 +14,10 @@ app.use(bodyParser.json());
 
 const port = 3000;
 
+app.get("/", (request, response) => {
+  response.sendFile(__dirname + "/index.html");
+});
+
 async function main() {
   await client.connect();
   const database = client.db(process.env.MONGO_DB_NAME);
