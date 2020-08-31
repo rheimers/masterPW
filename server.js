@@ -2,8 +2,8 @@ require("dotenv").config();
 
 const express = require("express");
 const { MongoClient } = require("mongodb");
-const { writePassword } = require("./lib/passwords");
-const { encrypt } = require("./lib/crypto");
+const { readPassword, writePassword } = require("./lib/passwords");
+const { decrypt, encrypt } = require("./lib/crypto");
 const bodyParser = require("body-parser");
 
 const client = new MongoClient(process.env.MONGO_URL, {
@@ -40,11 +40,15 @@ async function main() {
   });
 
   app.post("/api/passwords", async (request, response) => {
-    console.log("POST on /api/passwords");
-    const { name, value } = request.body;
-    const encryptedPassword = encrypt(value, masterPassword);
-    await writePassword(name, encryptedPassword, database);
-    response.status(201).send("Password created");
+    try {
+      const { name, value } = request.body;
+      const encryptedPassword = encrypt(value, masterPassword);
+      await writePassword(name, encryptedPassword, database);
+      response.status(201).send(`Password ${name} created`);
+    } catch (error) {
+      console.error(error);
+      response.status(500).send(error.message);
+    }
   });
 
   app.get("/", (request, response) => {
