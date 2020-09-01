@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const { MongoClient } = require("mongodb");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const createPasswordsRouter = require("./routes/passwords");
 const createUsersRouter = require("./routes/users");
 
@@ -19,6 +20,7 @@ async function main() {
   const masterPassword = process.env.MASTER_PASSWORD;
 
   app.use(bodyParser.json());
+  app.use(cookieParser());
 
   app.use((request, response, next) => {
     console.log(`Request ${request.method} on ${request.url}`);
