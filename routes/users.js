@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 
 function createUsersRouter(database) {
   const router = express.Router();
@@ -7,17 +8,21 @@ function createUsersRouter(database) {
 
   router.post("/login", async (request, response) => {
     try {
-      const { email, password } = request.body;
+      const { userName, password } = request.body;
       const user = await usersCollection.findOne({
-        email,
+        userName,
         password,
       });
       if (!user) {
         response.status(401).send("Wrong email or password");
         return;
       }
+      const token = jwt.sign({ userName }, process.env.JWT_SECRET, {
+        expiresIn: "360s",
+      });
 
-      console.log(user);
+      response.setHeader("Set-Cookie", `authToken=${token};path=/;Max-Age=360`);
+
       response.send("Logged in");
     } catch (error) {
       console.error(error);
